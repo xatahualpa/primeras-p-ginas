@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confeti Progresivo</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #282c34;
+    }
+
+    canvas {
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confettiCanvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById('confettiCanvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    let confetti = [];
+    const confettiColors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#00bcd4', '#4caf50', '#ffeb3b', '#ff9800'];
+
+    function ConfettiPiece(x, y, r, color, speed) {
+      this.x = x;
+      this.y = y;
+      this.r = r;
+      this.color = color;
+      this.speed = speed;
+      this.rotation = Math.random() * 360;
+      this.rotationSpeed = (Math.random() - 0.5) * 2;
+
+      this.update = function () {
+        this.y += this.speed;
+        this.rotation += this.rotationSpeed;
+        if (this.y > canvas.height) {
+          this.y = -10;
+        }
+      };
+
+      this.draw = function () {
+        ctx.save();
+        ctx.translate(this.x, this.y);
+        ctx.rotate(this.rotation * Math.PI / 180);
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(0, 0, this.r, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.restore();
+      };
+    }
+
+    function addConfetti() {
+      let x = Math.random() * canvas.width;
+      let y = Math.random() * canvas.height * 0.4;  // Start from the top half
+      let r = Math.random() * 6 + 2;
+      let color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+      let speed = Math.random() * 2 + 1;
+
+      confetti.push(new ConfettiPiece(x, y, r, color, speed));
+    }
+
+    function drawConfetti() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      for (let i = 0; i < confetti.length; i++) {
+        confetti[i].update();
+        confetti[i].draw();
+      }
+
+      requestAnimationFrame(drawConfetti);
+    }
+
+    function initConfetti() {
+      setInterval(addConfetti, 100);  // Add new confetti progressively
+      drawConfetti();
+    }
+
+    window.addEventListener('resize', function () {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    initConfetti();
+  </script>
+</body>
+</html>
